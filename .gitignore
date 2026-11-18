@@ -13,3 +13,4 @@ crypto_db.bib.*
 /web2py/
 __pycache__/
 /.venv/
+/changes.txt

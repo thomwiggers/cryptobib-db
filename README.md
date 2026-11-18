@@ -28,6 +28,7 @@ Python 3.12 or later is required. Run all commands from the repository root, exc
 - `make` generates `abbrev0.bib` to `abbrev3.bib`, `crypto.bib` and `crypto_crossref.bib` in the root. Git ignores these files.
 - `make test` runs the LaTeX tests. It needs TeX Live with `biber`, and `bibtex8` and `pplatex` compiled in `resources/tests` (see `resources/tests/README.md`). On systems without `libpcre3-dev` (Ubuntu 26.04, Debian 13), skip pplatex and run `make test PDFLATEX="pdflatex -interaction=nonstopmode -halt-on-error"`. With gcc 15 or newer, compile bibtex8 with `-std=gnu17` (see `resources/tests/README.md`).
 - `make export` copies the generated files and `changes.txt` into `export/` and `export_crossref/`. Clone [cryptobib/export](https://github.com/cryptobib/export) and [cryptobib/export_crossref](https://github.com/cryptobib/export_crossref) there, or set `EXPORT_DIR` and `EXPORT_CROSSREF_DIR` to other clones.
+- `make changes.txt` generates the change log from the git history. It needs the full history, not a shallow clone.
 - `make clean` removes the generated files.
 
 CI runs `make` and `make test` on every pull request. Update `changes.txt` when you change the database content.
@@ -47,8 +48,7 @@ This downloads `dblp.xml.gz` and `dblp.dtd` into `resources/importer/dblp-dump/`
 4. Update `abbrev.bibyml` and run `uv run python resources/tools/gen_abbrev.py`.
 5. Update `crypto_conf_list.bib`.
 6. Merge the imported file into `crypto_db.bib`: `uv run python resources/tools/add.py resources/importer/<conf><year>.bib`.
-7. Update `changes.txt`.
-8. Run `make`, then `make test`.
+7. Run `make`, then `make test`.
 
 ## Troubleshooting
 

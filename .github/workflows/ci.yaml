@@ -1,0 +1,79 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [master, monorepo]
+
+jobs:
+  build:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.3
+      - run: uv sync --locked
+      - run: make
+      - run: sha256sum abbrev?.bib crypto.bib crypto_crossref.bib
+
+  test:
+    name: test (${{ matrix.name }})
+    runs-on: ubuntu-26.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: bibtex8
+            bibtex8: true
+            targets: >-
+              test_abbrev0_bibtex.pdf test_abbrev0_crossref_bibtex.pdf
+              test_abbrev1_bibtex.pdf test_abbrev1_crossref_bibtex.pdf
+              test_abbrev2_bibtex.pdf test_abbrev2_crossref_bibtex.pdf
+              test_abbrev3_bibtex.pdf test_abbrev3_crossref_bibtex.pdf
+          - name: abbrev0 biber
+            targets: test_abbrev0_biber.pdf
+          - name: abbrev0 crossref biber
+            targets: test_abbrev0_crossref_biber.pdf
+          - name: abbrev1 biber
+            targets: test_abbrev1_biber.pdf
+          - name: abbrev1 crossref biber
+            targets: test_abbrev1_crossref_biber.pdf
+          - name: abbrev2 biber
+            targets: test_abbrev2_biber.pdf
+          - name: abbrev2 crossref biber
+            targets: test_abbrev2_crossref_biber.pdf
+          - name: abbrev3 biber
+            targets: test_abbrev3_biber.pdf
+          - name: abbrev3 crossref biber
+            targets: test_abbrev3_crossref_biber.pdf
+    env:
+      APT_PACKAGES: build-essential texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-bibtex-extra biber
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.3
+      # $APT_PACKAGES is unquoted on purpose in this step and the install step: word splitting passes each package separately.
+      - id: apt-plan
+        shell: bash
+        run: |
+          sudo apt-get update
+          # Hash only the "filename size checksum" fields of the 'URL' lines: the URL depends on the mirror.
+          hash=$(sudo apt-get install --print-uris -y --no-install-recommends $APT_PACKAGES | awk -v q="'" 'index($0, q) == 1 {print $2, $3, $4}' | LC_ALL=C sort | sha256sum | cut -c1-16)
+          echo "hash=$hash" >> "$GITHUB_OUTPUT"
+      # A slow Ubuntu mirror made the 205 MB download take 47 minutes in one run. The key follows the package versions apt will install, so the cache refreshes itself.
+      - uses: actions/cache@v6
+        with:
+          path: ~/apt-archives
+          key: apt-texlive-ubuntu-26.04-${{ steps.apt-plan.outputs.hash }}
+          restore-keys: apt-texlive-ubuntu-26.04-
+      - run: |
+          mkdir -p "$HOME/apt-archives/partial"
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dir::Cache::Archives="$HOME/apt-archives" -o APT::Keep-Downloaded-Packages=true $APT_PACKAGES
+          sudo apt-get autoclean -o Dir::Cache::Archives="$HOME/apt-archives" -o APT::Clean-Installed=false
+          sudo rm -rf "$HOME/apt-archives/partial" "$HOME/apt-archives/lock"
+          sudo chown -R "$USER" "$HOME/apt-archives"
+      - if: matrix.bibtex8
+        run: make -C resources/tests/bibtex8 -f unix.mak bibtex-exe CC=gcc CFLAGS="-std=gnu17 -Wall -Wno-char-subscripts -funsigned-char" LD=gcc
+      - run: uv sync --locked
+      - run: make
+      - env:
+          TARGETS: ${{ matrix.targets }}
+        # $TARGETS is unquoted on purpose: word splitting passes each document as a separate make target.
+        run: make -C resources/tests $TARGETS PDFLATEX="pdflatex -interaction=nonstopmode -halt-on-error"

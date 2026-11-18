@@ -17,4 +17,13 @@ extend-exclude = ["resources/tests/bibtex8", "resources/tests/pplatex"]
 
 [tool.pyright]
 include = ["resources/tools", "resources/lib", "resources/importer"]
-extraPaths = ["resources/lib", ".", "resources/importer"]
+extraPaths = ["resources/lib", ".", "resources/importer", "resources/tools"]
+venvPath = "."
+venv = ".venv"
+
+[dependency-groups]
+dev = ["pytest"]
+
+[tool.pytest.ini_options]
+testpaths = ["resources/tools/tests"]
+pythonpath = ["resources/tools"]

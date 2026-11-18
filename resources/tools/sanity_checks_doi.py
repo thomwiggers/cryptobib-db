@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-This script needs to be run in the root folder containing the
-folders "lib" and "db"
+Run this script from the repository root.
 """
 
 import collections
@@ -10,7 +9,7 @@ import os
 
 scriptdir = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(scriptdir, "..", "lib"))
-sys.path.append(os.path.join(scriptdir, "..", "db"))
+sys.path.append(os.path.join(scriptdir, "..", ".."))
 
 import mybibtex.parser
 import mybibtex.database
@@ -75,9 +74,9 @@ def is_lncs(db, entry):
 
 def check_doi(args):
     parser = mybibtex.parser.Parser()
-    parser.parse_file("db/abbrev3.bib")
-    parser.parse_file("db/crypto_db.bib")
-    db = parser.parse_file("db/crypto_conf_list.bib")
+    parser.parse_file("abbrev3.bib")
+    parser.parse_file("crypto_db.bib")
+    db = parser.parse_file("crypto_conf_list.bib")
 
     myfilter = mybibtex.generator.FilterPaper()
     filter_conf = args.filter
@@ -126,7 +125,7 @@ def main():
     parser.add_argument("--verbose", action="store_true", help="display also successful checks")
     args = parser.parse_args()
 
-    shutil.copy("db/crypto_db.bib", "db/crypto_db.bib.{:0>12d}".format(int(time.time())))
+    shutil.copy("crypto_db.bib", "crypto_db.bib.{:0>12d}".format(int(time.time())))
 
     check_doi(args)
 

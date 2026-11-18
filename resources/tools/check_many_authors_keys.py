@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-This script needs to be run in the root folder containing the
-folders "lib" and "db"
+Run this script from the repository root.
 """
 
 import collections
@@ -10,7 +9,7 @@ import os
 
 scriptdir = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(scriptdir, "..", "lib"))
-sys.path.append(os.path.join(scriptdir, "..", "db"))
+sys.path.append(os.path.join(scriptdir, "..", ".."))
 
 import mybibtex.parser
 import mybibtex.database
@@ -49,9 +48,9 @@ def check_more_6_authors(args):
     because original rule of cryptobib is to have at most 6 initials in key
     """
     parser = mybibtex.parser.Parser()
-    parser.parse_file("db/abbrev3.bib")
-    parser.parse_file("db/crypto_db.bib")
-    db = parser.parse_file("db/crypto_conf_list.bib")
+    parser.parse_file("abbrev3.bib")
+    parser.parse_file("crypto_db.bib")
+    db = parser.parse_file("crypto_conf_list.bib")
 
     my_filter = mybibtex.generator.FilterPaper()
     filter_conf = args.filter

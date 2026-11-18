@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
 This script updates the database of the web server using
-  db/abbrev0.bib
-  db/abbrev1.bib
-  db/abbrev2.bib
-  db/abbrev3.bib
-  db/crypto_db.bib
-  db/crypto_conf_list.bib
-  db/crypto_db_misc.bib
-  db/changes.txt
+  abbrev0.bib
+  abbrev1.bib
+  abbrev2.bib
+  abbrev3.bib
+  crypto_db.bib
+  crypto_conf_list.bib
+  crypto_misc.bib
+  changes.txt
 
-WARNING: THIS SCRIPT NEEDS TO BE EXECUTED in the ROOT folder of the cryptobib project
-   AND web2py needs to installed as explained in webapp/README.md
+Run this script from the repository root.
+web2py needs to be installed as explained in webapp/README.md.
 
 In addition, it may be necessary to clear the cache of the web server or to restart it, after updating storage.sqlite.
 Please read README.md for details.
@@ -22,8 +22,8 @@ import os
 scriptdir = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(".")
 sys.path.append(os.path.join(scriptdir, "..", "lib"))
-sys.path.append(os.path.join(scriptdir, "..", "db"))
-sys.path.append(os.path.join(scriptdir, "..", "web2py"))
+sys.path.append(os.path.join(scriptdir, "..", ".."))
+sys.path.append(os.path.join(scriptdir, "..", "..", "web2py"))
 
 from mybibtex import tools
 import mybibtex.parser
@@ -62,7 +62,7 @@ def update_changes(db):
 
     changes = []
 
-    fin = open("../db/changes.txt")
+    fin = open("../changes.txt")
     lineno = 1
     for line in fin:
         if lineno == 1 and line[0] != "*":
@@ -173,9 +173,9 @@ def main():
 
     print("* read crypto_db.bib")
     parser = mybibtex.parser.Parser()
-    parser.parse_file("../db/abbrev0.bib")
-    parser.parse_file("../db/crypto_db.bib")
-    cryptodb = parser.parse_file("../db/crypto_conf_list.bib")
+    parser.parse_file("../abbrev0.bib")
+    parser.parse_file("../crypto_db.bib")
+    cryptodb = parser.parse_file("../crypto_conf_list.bib")
     confs_years = get_confs_years_inter(cryptodb, confs_missing_years)
 
     print("* update changes table")

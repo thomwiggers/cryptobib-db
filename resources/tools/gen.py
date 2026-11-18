@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """
-This script generates db/crypto.bib from
-  db/abbrev0.bib
-  db/crypto_db.bib
-  db/crypto_conf_list.bib
-  db/crypto_db_misc.bib
+This script generates crypto.bib from
+  abbrev0.bib
+  crypto_db.bib
+  crypto_conf_list.bib
+  crypto_misc.bib
 
-This script needs to be run in the root folder containing the
-folders "lib" and "db"
+Run this script from the repository root.
 """
 
 import sys
@@ -15,7 +14,7 @@ import os
 
 scriptdir = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(scriptdir, "..", "lib"))
-sys.path.append(os.path.join(scriptdir, "..", "db"))
+sys.path.append(os.path.join(scriptdir, "..", ".."))
 
 from config import *
 import config
@@ -31,9 +30,9 @@ logging.basicConfig(level=logging.DEBUG)
 
 def gen_crypto_bib(db, confs_years, expand_crossrefs: bool):
     if expand_crossrefs == False:
-        outname = "db/crypto_crossref.bib"
+        outname = "crypto_crossref.bib"
     else:
-        outname = "db/crypto.bib"
+        outname = "crypto.bib"
 
     with open(outname, "w") as out:
         out.write(header.get_header(config, "gen.py", confs_years))
@@ -44,7 +43,7 @@ def gen_crypto_bib(db, confs_years, expand_crossrefs: bool):
         out.write("\n")
         out.write("\n")
 
-        with open("db/crypto_misc.bib") as fin:
+        with open("crypto_misc.bib") as fin:
             for line in fin:
                 out.write(line)
 
@@ -54,9 +53,9 @@ def main():
     # It's important to use abbrev0.bib for the parsing
     # otherwise we may be removing fields that are empty for abbrev3.bib but not for abbrev0.bib
     # as we are removing fields that are empty after macro expansion
-    parser.parse_file("db/abbrev0.bib")
-    parser.parse_file("db/crypto_db.bib")
-    db = parser.parse_file("db/crypto_conf_list.bib")
+    parser.parse_file("abbrev0.bib")
+    parser.parse_file("crypto_db.bib")
+    db = parser.parse_file("crypto_conf_list.bib")
 
     confs_years = get_confs_years_inter(db, confs_missing_years)
 

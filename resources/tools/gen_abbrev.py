@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 """
-This script generates db/abbrev?.bib from db/abbrev.bibyml.
-This script needs to be run in the root folder containing the
-folders "lib" and "db"
+This script generates abbrev?.bib from abbrev.bibyml.
+Run this script from the repository root.
 """
 
 import sys
 import os
 scriptdir = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(scriptdir, "..", "lib"))
-sys.path.append(os.path.join(scriptdir, "..", "db"))
+sys.path.append(os.path.join(scriptdir, "..", ".."))
 
 import bibyml
 import logging
@@ -87,12 +86,12 @@ def check_abbrev(abbrev):
 
 
 def main():
-    abbrev = bibyml.parse(open("db/abbrev.bibyml"))
+    abbrev = bibyml.parse(open("abbrev.bibyml"))
 
     check_abbrev(abbrev)
 
     for short in range(4):
-        with open("db/abbrev{}.bib".format(short), "w") as out:
+        with open("abbrev{}.bib".format(short), "w") as out:
             gen(out, abbrev, short=short)
 
 

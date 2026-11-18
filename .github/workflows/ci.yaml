@@ -78,3 +78,14 @@ jobs:
           TARGETS: ${{ matrix.targets }}
         # $TARGETS is unquoted on purpose: word splitting passes each document as a separate make target.
         run: make -C resources/tests $TARGETS PDFLATEX="pdflatex -interaction=nonstopmode -halt-on-error"
+
+  changelog:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v10.3.3
+      - run: uv sync --locked
+      - run: make changes.txt
+      - run: head -20 changes.txt

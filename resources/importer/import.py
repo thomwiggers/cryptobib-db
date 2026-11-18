@@ -12,7 +12,7 @@ import sys
 
 scriptdir = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(scriptdir, "..", "lib"))
-sys.path.append(os.path.join(scriptdir, "..", "db"))
+sys.path.append(os.path.join(scriptdir, "..", ".."))
 
 import xml.etree.ElementTree
 from xml.etree import ElementTree
@@ -1295,7 +1295,7 @@ def run(confkey, year, dis, overwrite=False, volume=None, offline=False, element
             logging.error(
                 'Local DBLP dump not found in "{0}".\n'
                 "Run `python3 fetch_dblp_dump.py` first to download it "
-                "(see db_import/fetch_dblp_dump.py --help).".format(DBLP_DUMP_DIR)
+                "(see resources/importer/fetch_dblp_dump.py --help).".format(DBLP_DUMP_DIR)
             )
             sys.exit(1)
 

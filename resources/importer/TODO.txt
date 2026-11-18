@@ -1,0 +1,34 @@
+Need to update:
+- FC23-1
+- FC23-2
+- FCW22
+- FCW23
+- FOCS23
+- ITCS22
+- ITCS23
+- ITCS24
+- JCEng24
+- JC24
+- NDSS22
+- NDSS23
+- PODC24
+- PoPETS24
+- SODA22
+- SODA23
+- SODA24
+- USENIX23
+
+
+Conferences:
+CSF
+RANDOM / APPROX
+
+Journals:
+Journal of the ACM
+Commnications of the ACM
+SIAM Journal of Computing
+IET Information Security
+Theoretical Computer Science
+
+Archives:
+

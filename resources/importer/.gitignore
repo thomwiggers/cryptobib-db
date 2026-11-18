@@ -1,0 +1,16 @@
+*~
+*.pyc
+*.bib
+
+*.aux
+*.bbl
+*.blg
+*.log
+*.pdf
+*.bcf
+*.run.xml
+
+.DS_Store
+/auto
+/dblp-dump/
+/.venv/

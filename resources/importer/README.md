@@ -1,5 +1,11 @@
 # CryptoBib Database Import
 
-**WARNING**: This is probably not the repository your are interested in. This repository is only for *cryptobib* developers. The repositories containing the public *bib* files are [cryptobib/export](https://github.com/cryptobib/export) and  [cryptobib/export_crossref](https://github.com/cryptobib/export_crossref).
+Tools that import bibtex entries from DBLP, ePrint and other sources. See the root `README.md` for the steps to add a conference.
 
-**WARNING**: This project shall only be used as a subfolder of the main project [cryptobib/cryptobib](https://github.com/cryptobib/cryptobib). Please read the documentation of the main project, including the setup instructions for `fetch_dblp_dump.py`.
+`import.py` opens `utf8ienc.dtx` relative to the current directory. Run the scripts in this directory from inside `resources/importer`:
+
+    cd resources/importer
+    uv run python fetch_dblp_dump.py
+    uv run python import.py <conf><year>
+
+`fetch_dblp_dump.py` downloads a local copy of the DBLP XML dump into `dblp-dump/`. `import.py` reads it before it falls back to a live DBLP fetch.

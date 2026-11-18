@@ -1,20 +1,22 @@
-# CryptoBib Test Repository for Developers
-
-**WARNING**: This is probably not the repository your are interested in. This repository is only for *cryptobib* developers. The repositories containing the public *bib* files are [cryptobib/export](https://github.com/cryptobib/export) and  [cryptobib/export_crossref](https://github.com/cryptobib/export_crossref).
-
-**WARNING**: This project shall only be used as a subfolder of the main project [cryptobib/cryptobib](https://github.com/cryptobib/cryptobib). Please read the documentation of the main project.
+# CryptoBib Tests
 
 ## Getting started
 
 ### Requirements
 
-- see `README.md` from the main project
+- the setup of the root `README.md` (`uv sync`)
+- TeX Live with `biber`
+- a C compiler
 - compile bibtex8:
 
 		cd bibtex8
 		make -f unix.mak linux-gcc
 
-- scons (can be installed via `python -m pip install scons`)
+  The bibtex8 sources do not compile as C23, the default of gcc 15 and newer. With these compilers, run instead:
+
+		make -f unix.mak bibtex-exe CC=gcc CFLAGS="-std=gnu17 -Wall -Wno-char-subscripts -funsigned-char" LD=gcc
+
+- `scons` (for example `uv tool install scons`) and the PCRE development headers (`libpcre3-dev` on Debian)
 - compile pplatex
 
 		cd pplatex
@@ -29,13 +31,15 @@ scons PCREPATH="$(brew --prefix pcre)"
 
 ### Run all tests
 
-Just launch `make` and check output (and *.pdf files).
+Run `make test` in the repository root. Check the output and the `*.pdf` files.
 
-## Troubleshoothing
+On systems without `libpcre3-dev` (Ubuntu 26.04, Debian 13), skip pplatex and run `make test PDFLATEX="pdflatex -interaction=nonstopmode -halt-on-error"` in the repository root. CI does the same.
+
+## Troubleshooting
 
 ### Clean tests
 
-Just launch `make clean`.
+Run `make -C resources/tests clean` from the repository root.
 
 ## Under the hood
 

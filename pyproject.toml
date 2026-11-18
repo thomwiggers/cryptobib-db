@@ -1,0 +1,20 @@
+[project]
+name = "cryptobib"
+version = "0"
+description = "CryptoBib database and tooling"
+requires-python = ">=3.12"
+dependencies = [
+    "pybtex==0.24",
+    "unidecode",
+    "setuptools<81",  # pybtex 0.24 imports pkg_resources
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+extend-exclude = ["resources/tests/bibtex8", "resources/tests/pplatex"]
+
+[tool.pyright]
+include = ["resources/tools", "resources/lib", "resources/importer"]
+extraPaths = ["resources/lib", ".", "resources/importer"]

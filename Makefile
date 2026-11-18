@@ -1,4 +1,4 @@
-PYTHON=python3
+PYTHON=uv run python
 ABBREV_BIB=abbrev0.bib abbrev1.bib abbrev2.bib abbrev3.bib
 GENERATED=$(ABBREV_BIB) crypto.bib crypto_crossref.bib
 EXPORT_DIR=export

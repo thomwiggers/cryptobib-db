@@ -1,0 +1,63 @@
+name: PR title
+on:
+  pull_request_target:
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  title:
+    name: PR title
+    if: github.event.action != 'edited' || github.event.changes.title || github.event.changes.base
+    runs-on: ubuntu-26.04
+    concurrency:
+      group: pr-title-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    steps:
+      # pull_request_target checks out the base branch. Never check out the pull request here.
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          sparse-checkout: resources/tools
+      - name: Check the title
+        id: check
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          CHANGED_FILES: ${{ github.event.pull_request.changed_files }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh api --paginate "repos/$REPO/pulls/$PR_NUMBER/files" \
+            --jq '.[] | [.filename, (.previous_filename // "")] | @tsv' > "$RUNNER_TEMP/files.tsv"
+          count=$(wc -l < "$RUNNER_TEMP/files.tsv")
+          if [ "$count" -ne "$CHANGED_FILES" ]; then
+            echo "::error::The file list is incomplete: the API returned $count of $CHANGED_FILES changed files."
+            exit 1
+          fi
+          # Check the new and the old path of every file, so that renaming a data file needs the data scope.
+          cut -f1,2 --output-delimiter=$'\n' "$RUNNER_TEMP/files.tsv" | grep -v '^$' > "$RUNNER_TEMP/files.txt" || true
+          status=0
+          python3 resources/tools/check_pr_title.py --title="$PR_TITLE" \
+            --files-from "$RUNNER_TEMP/files.txt" --comment-out "$RUNNER_TEMP/comment.md" || status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+      - name: Comment
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          STATUS: ${{ steps.check.outputs.status }}
+        run: |
+          gh api --paginate "repos/$REPO/issues/$PR_NUMBER/comments" \
+            --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | startswith("<!-- cryptobib-title-check -->"))) | .id' > "$RUNNER_TEMP/comment-ids.txt"
+          id=$(head -n 1 "$RUNNER_TEMP/comment-ids.txt")
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/$REPO/issues/comments/$id" -F body=@"$RUNNER_TEMP/comment.md" > /dev/null
+          elif [ "$STATUS" != "0" ]; then
+            gh api -X POST "repos/$REPO/issues/$PR_NUMBER/comments" -F body=@"$RUNNER_TEMP/comment.md" > /dev/null
+          fi
+          exit "$STATUS"

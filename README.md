@@ -9,7 +9,8 @@ To use CryptoBib in a LaTeX project, you want the generated files instead. They 
 - `crypto_db.bib`, `crypto_misc.bib`: the bibtex entries.
 - `crypto_conf_list.bib`: the list of all conferences.
 - `abbrev.bibyml`: the macro definitions, from which `abbrev0.bib` to `abbrev3.bib` are generated.
-- `changes.txt`, `config.py`: the change log and the database configuration.
+- `changes-archive.txt`: the frozen change log up to the cutoff. `changes.txt` is generated from pull request titles and the archive, and is not in the repository.
+- `config.py`: the database configuration.
 - `resources/tools`: generate the output files and merge imported entries into the database.
 - `resources/lib`: Python libraries used by the tools, including the bibtex parser and generator `mybibtex`.
 - `resources/importer`: import entries from DBLP, ePrint and other sources.
@@ -31,7 +32,30 @@ Python 3.12 or later is required. Run all commands from the repository root, exc
 - `make changes.txt` generates the change log from the git history. It needs the full history, not a shallow clone.
 - `make clean` removes the generated files.
 
-CI runs `make` and `make test` on every pull request. Update `changes.txt` when you change the database content.
+CI runs `make` and `make test` on every pull request. `changes.txt` is generated from pull request titles, so nobody edits it.
+
+## Pull request titles
+
+The changelog is generated from the titles of merged pull requests. Commits pushed directly to `master` follow the same format. CI checks the title and comments with a suggestion if it does not follow the format.
+
+A title is `type(scope): description` or `type(scope)!: description`.
+
+| Title | Use | Changelog |
+|---|---|---|
+| `add(data): ...` | new venues, volumes, entries | Added |
+| `fix(data): ...` | corrections to existing entries | Fixed |
+| `add(data)!: ...`, `fix(data)!: ...` | a change that can break a user's document: renamed or removed keys, changed abbreviations or displayed names | Breaking |
+| any other title | no data change | omitted |
+
+Examples:
+
+    add(data): FC 2025, FCW 2025, ICISC 2025
+    fix(data): title of EC:CFSY96
+    fix(data)!: rename keys of entries with more than six authors
+    fix(tools): keep the month macros in add.py
+    ci: cache the bibtex8 binary
+
+A pull request that changes `crypto_db.bib`, `crypto_misc.bib`, `crypto_conf_list.bib` or `abbrev.bibyml` must use the `data` scope with type `add` or `fix`. Other titles use one of `feat`, `fix`, `chore`, `ci`, `docs`, `build`, `refactor` or `test`. The scope is optional and free. The description is not empty and does not end with a period.
 
 ## Add a conference
 

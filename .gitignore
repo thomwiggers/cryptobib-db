@@ -7,3 +7,9 @@ crypto_db.bib.*
 
 .DS_Store
 /auto
+/export/
+/export_crossref/
+/webapp/
+/web2py/
+__pycache__/
+/.venv/

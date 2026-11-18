@@ -1,35 +1,33 @@
 PYTHON=python3
-ABBREV_BIB=db/abbrev0.bib db/abbrev1.bib db/abbrev2.bib db/abbrev3.bib
-EXPORT_DIRS=export export_crossref
+ABBREV_BIB=abbrev0.bib abbrev1.bib abbrev2.bib abbrev3.bib
+GENERATED=$(ABBREV_BIB) crypto.bib crypto_crossref.bib
+EXPORT_DIR=export
+EXPORT_CROSSREF_DIR=export_crossref
 
-.PHONY: all test web clean FORCE_MAKE
+.PHONY: all export test web clean
 
-all: ${ABBREV_BIB} db/crypto.bib db/crypto_crossref.bib db/changes.txt export/crypto.bib export_crossref/crypto_crossref.bib FORCE_MAKE
-	for d in ${EXPORT_DIRS}; do cp ${ABBREV_BIB} "$$d"; done
-	for d in ${EXPORT_DIRS}; do cp db/changes.txt "$$d"; done
+all: $(GENERATED)
 
+abbrev%.bib: abbrev.bibyml resources/tools/gen_abbrev.py
+	$(PYTHON) resources/tools/gen_abbrev.py
 
-export/crypto.bib: db/crypto.bib
-	cp db/crypto.bib export
+crypto.bib crypto_crossref.bib: abbrev0.bib crypto_db.bib crypto_misc.bib crypto_conf_list.bib resources/tools/gen.py
+	$(PYTHON) resources/tools/gen.py
 
-export_crossref/crypto_crossref.bib: db/crypto_crossref.bib
-	cp db/crypto_crossref.bib export_crossref
+export: all
+	@test -d "$(EXPORT_DIR)" || { echo "EXPORT_DIR=$(EXPORT_DIR) is not a directory. Clone cryptobib/export there." >&2; exit 1; }
+	@test -d "$(EXPORT_CROSSREF_DIR)" || { echo "EXPORT_CROSSREF_DIR=$(EXPORT_CROSSREF_DIR) is not a directory. Clone cryptobib/export_crossref there." >&2; exit 1; }
+	cp $(ABBREV_BIB) changes.txt crypto.bib "$(EXPORT_DIR)"
+	cp $(ABBREV_BIB) changes.txt crypto_crossref.bib "$(EXPORT_CROSSREF_DIR)"
 
 test: all
-	cd db_test && $(MAKE)
+	cd resources/tests && $(MAKE)
 
-db/abbrev%.bib: db/abbrev.bibyml db_tools/gen_abbrev.py
-	$(PYTHON) db_tools/gen_abbrev.py
-
-db/crypto.bib db/crypto_crossref.bib: db/abbrev0.bib db/crypto_db.bib db/crypto_misc.bib db/crypto_conf_list.bib db_tools/gen.py
-	$(PYTHON) db_tools/gen.py
-
-clean: 
-	rm -f $(ABBREV_BIB)
-	rm -f db/crypto.bib db/crypto_crossref.bib 
+clean:
+	rm -f $(GENERATED)
 
 web: all webapp/static/files/crypto.zip
-	$(PYTHON) db_tools/update_webapp_db.py
+	$(PYTHON) resources/tools/update_webapp_db.py
 
-webapp/static/files/crypto.zip: db/crypto.bib db/crypto_crossref.bib ${ABBREV_BIB}
-	zip -j webapp/static/files/crypto.zip $^
+webapp/static/files/crypto.zip: crypto.bib crypto_crossref.bib $(ABBREV_BIB)
+	zip -j $@ $^

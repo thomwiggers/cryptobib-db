@@ -1,4 +1,4 @@
-#!/bin/env python3
+#!/usr/bin/env python3
 
 from string import Template
 
@@ -13,7 +13,7 @@ test_template_bibtex = r"""\documentclass[a4paper,10pt]{article}
 
 \nocite{*}
 \bibliographystyle{alpha}
-\bibliography{../db/abbrev${short},../db/crypto${crossref}}
+\bibliography{../../abbrev${short},../../crypto${crossref}}
 
 \end{document}
 """
@@ -28,7 +28,7 @@ test_template_biber = r"""\documentclass[a4paper,10pt]{article}
 
 \usepackage{biblatex}
 
-\bibliography{../db/abbrev${short},../db/crypto${crossref}}
+\bibliography{../../abbrev${short},../../crypto${crossref}}
 
 \begin{document}
 
